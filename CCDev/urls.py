@@ -19,7 +19,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns = [
-    path('CCDev/', include('app_CCDev.urls')),
+    path('', include('app_CCDev.urls')),
     path('admin/', admin.site.urls),
 ]+static(settings.STATIC_URL,document_root=settings.STATIC_ROOT)
 
