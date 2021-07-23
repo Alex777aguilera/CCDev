@@ -26,7 +26,7 @@ SECRET_KEY = 'l$-_y8m4z^_pnz-@i0w8kchq0vd(ys5=ojlonmu1l@u2kr#-h5'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-# ALLOWED_HOSTS = ['deployCCDev.herokuapp.com/CCDev']
+ALLOWED_HOSTS = ['ccdevp.herokuapp.com/CCDev']
 
 
 # Application definition
