@@ -1,0 +1,9 @@
+.vscode 
+staticfiles
+CCDev/settings.py
+db.py
+__pycache__
+app_CCDev/__pycache__/*
+CCDev/__pycache__/*
+app_CCDev/migrations/__pycache__/*
+*.DS_Store
