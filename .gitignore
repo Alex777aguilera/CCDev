@@ -1,6 +1,6 @@
 .vscode 
 staticfiles
-CCDev/settings.py
+
 db.py
 __pycache__
 app_CCDev/__pycache__/*
