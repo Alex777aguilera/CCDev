@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render,redirect
 from django.http import HttpResponseRedirect,JsonResponse, HttpResponse
 from django.urls import reverse
 from django.contrib.auth import login as auth_login,logout,authenticate
@@ -9,6 +9,7 @@ from django.contrib.auth.decorators import login_required, permission_required
 from django.core import serializers
 from django.contrib.auth.hashers import make_password
 import requests
+
 
 from rest_framework import serializers
 from rest_framework import status
