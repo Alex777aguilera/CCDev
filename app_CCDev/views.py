@@ -48,3 +48,45 @@ def CAPI(request):
 	# 	ctx = {'books':books['results']}	
 	return render(request,'inicio.html')
 
+# @login_required
+def Vista_Tcuenta(request):
+	Tcuentas = Tipo_Cuenta.objects.all()
+
+	if request.user.is_superuser:
+		ret_data,query_Tcuenta,errores = {},{},{}
+
+		if request.method == 'POST':
+			ret_data['tipo_cuenta'] = request.POST.get('tipo_cuenta')
+			
+			if request.POST.get('tipo_cuenta') == '':
+				errores['tipo_cuenta'] = "Debe ingresar El tipo de cuenta"
+			elif Tipo_Cuenta.objects.filter(tipo_cuenta = request.POST.get('tipo_cuenta')).exists(): 
+				#Si el registro ya existe en la base de datos
+				errores['existe'] = 'Tipo de Cuenta existente!!'		
+			else:
+				query_Tcuenta['tipo_cuenta'] = request.POST.get('tipo_cuenta')
+
+			print(errores)
+
+			if not errores:
+				try:
+					tcuenta = Tipo_Cuenta(**query_Tcuenta)
+					tcuenta.save()
+					pass
+				except Exception as e:
+					transaction.rollback()
+					errores['administrador'] = e
+					ctx = {'Tcuentas':Tcuentas,'errores':errores,'ret_data':ret_data}
+
+					return render(request,'Vista_Tcuenta.html',ctx)
+				else:
+					transaction.commit()
+					return HttpResponseRedirect(reverse('app_CCDev:Vista_Tcuenta')+'?ok')
+			else:
+				ctx = {'Tcuentas':Tcuentas,'errores':errores,'ret_data':ret_data}
+				return render(request,'Vista_Tcuenta.html',ctx)
+		else:
+			ctx = {'Tcuentas':Tcuentas}
+			return render(request,'Vista_Tcuenta.html',ctx)
+	else:
+		return redirect('app_CCDev:principal')	
