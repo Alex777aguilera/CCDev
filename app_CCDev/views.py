@@ -8,6 +8,7 @@ from app_CCDev.models import *
 from django.contrib.auth.decorators import login_required, permission_required
 from django.core import serializers
 from django.contrib.auth.hashers import make_password
+import requests
 
 from rest_framework import serializers
 from rest_framework import status
@@ -19,6 +20,7 @@ def principal(request):
 	return render(request,'principal_base.html')
 		
 def otra_view(request):
+	CAPI(request)
 	return render(request,'inicio.html')
 
 class Apisend(APIView):
@@ -33,3 +35,16 @@ class Apisend(APIView):
 		else:
 			ctx = {'error','No hay Registros'}
 			return Response(ctx)
+
+
+def CAPI(request):
+	ctx = {}
+	Dapi = requests.get('https://ccdevp.herokuapp.com/vista/ApiCliente')
+	Data = Dapi.json()
+	print (Data)
+	# if Data:
+	# 	ctx = {'books':books['results']}
+	# else:
+	# 	ctx = {'books':books['results']}	
+	return render(request,'inicio.html')
+
