@@ -19,7 +19,12 @@ from rest_framework.response import Response
 
 def principal(request):
 	return render(request,'principal_base.html')
-		
+
+# def cerrar_sesion(request):
+# 	logout(request)
+# 	return HttpResponseRedirect(reverse('Iuth_app:login'))
+
+
 def otra_view(request):
 	CAPI(request)
 	return render(request,'inicio.html')
