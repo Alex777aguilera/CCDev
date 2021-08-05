@@ -57,3 +57,26 @@ class Transacciones(models.Model):
     def __str__(self):
         return "{}-{}-{}-{}".format(self.pk,self.id_cuenta,self.id_cliente.nombres,self.id_cliente.apellidos,self.id_tipo_transaccion.tipo_transaccion)
 
+# Tablas feas
+class CLIENT(models.Model):
+    ID = models.CharField(max_length=100, primary_key=True)
+    NAME = models.CharField(max_length=250, null= False,blank=False)
+    ORIGIN = models.CharField(max_length=30, null= False,blank=False)
+    AGE = models.PositiveIntegerField()
+    STATUS = models.CharField(max_length=10, null= False,blank=False)
+
+    def __str__(self):
+        return "{}-{}".format(self.ID,self.NAME,self.STATUS)
+
+class ACCOUNT_BANK(models.Model):
+    ID = models.CharField(max_length=100, primary_key=True)
+    DATES = models.CharField(max_length=8, null= False,blank=False)
+    DESCR = models.CharField(max_length=500, null= False,blank=False)
+    ID_CLIENT = models.CharField(max_length=100, null= False,blank=False)
+    TYPE = models.CharField(max_length=1, null= False,blank=False)
+    DEBT = models.FloatField(null= False,blank=False)
+    CRED = models.FloatField(null= False,blank=False)
+    BALANCE = models.FloatField(null= False,blank=False)
+
+    def __str__(self):
+        return "{}-{}".format(self.ID,self.ID_CLIENT,self.CRED)
