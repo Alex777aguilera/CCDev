@@ -91,7 +91,7 @@ CC-DEV | Cliente
                             <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
                             Registrar
                             </button>
-                            <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+                            <button type="button" class="btn btn-success btn-sm">
                             <a class="text-light" href="{% url 'app_CCDev:Vista_Cliente' %}">Actualizar
                             </a>
                             </button>
@@ -105,6 +105,8 @@ CC-DEV | Cliente
                                         <th>Origen</th>
                                         <th>Edad</th>
                                         <th>Estado</th>
+                                        <th>Modificar</th>
+                                        <th>Eliminar</th>
                                         
                                     </tr>
                                 </thead>
@@ -118,8 +120,25 @@ CC-DEV | Cliente
                                             <td>{{cliente.ORIGIN}}</td>
                                             <td>{{cliente.AGE}}</td>
                                             <td>{{cliente.STATUS}}</td>
+                                            <td>
+                                                <center>
+                                                <button type="button" class="btn btn-success btn-sm">
+                                                   <a class="text-light" href="{% url 'app_CCDev:modificar_CLIENT' cliente.ID %}"><i class="fas fa-user-edit"></i></a>
+                                                </button>
+                                                </center>
+                                            </td>
+                                            <td>
+                                                <center>
+                                                <button type="button" class="btn btn-danger btn-sm">
+                                                   <a class="text-light" href="{% url 'app_CCDev:Eliminar_cliente' cliente.ID %}"><i class="fas fa-user-minus"></i></a>
+                                                </button>
+                                                </center>
+                                            </td>
                                             
                                         </tr>
+                                       
+ </div>
+                                       
                                     {% empty %}
                                         <p class="icontext"><i class="fas fa-exclamation-circle"> </i>  Aun no hay registros!!.</p>
                                     {% endfor %}
@@ -136,8 +155,7 @@ CC-DEV | Cliente
 
     </div>
  </section><!-- End Contact Section -->
-  
-
+                                  
 {% endblock content %}
 
 {% block js %}

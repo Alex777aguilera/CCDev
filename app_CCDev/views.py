@@ -17,7 +17,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.parsers import JSONParser
 # Create your views here.
-
+ 
 def principal(request):
 	return render(request,'principal_base.html')
 
@@ -55,7 +55,7 @@ def CAPI(request):
 	# 	ctx = {'books':books['results']}	
 	return render(request,'inicio.html')
 
-# @login_required
+@login_required
 def Vista_Tcuenta(request):
 	Tcuentas = Tipo_Cuenta.objects.all()
 
@@ -99,10 +99,11 @@ def Vista_Tcuenta(request):
 		return redirect('app_CCDev:principal')	
 
 # Registro Vista Cliente
+@login_required
 def Vista_Cliente(request):
 	Clients = CLIENT.objects.all()
 	CAPIClient(request)
-	CAPIACCOUNT_BANK(request)
+	# CAPIACCOUNT_BANK(request)
 	if request.user.is_superuser:
 		query_CLEINT,errores = {},{}
 
@@ -162,11 +163,59 @@ def Vista_Cliente(request):
 	else:
 		return redirect('app_CCDev:principal')	
 
+# Modificar CLIENT
+@login_required
+def modificar_CLIENT(request,id_CLIENT):
+	if request.user.is_superuser:
+		
+		errores = {}
+		clientes = CLIENT.objects.filter(ID=id_CLIENT)
+		
+		if request.method == 'POST':
+
+			if request.POST.get('NAME') == '' or request.POST.get('ORIGIN') == '' or request.POST.get('AGE') == '' or request.POST.get('STATUS') == '':
+				errores['NAME'] = "HAY ERRORES"
+
+			if not errores:	
+				try:
+					cliente = CLIENT.objects.filter(ID=id_CLIENT).update(
+																			NAME = request.POST.get('NAME'),
+																			ORIGIN = request.POST.get('ORIGIN'),
+																			AGE = request.POST.get('AGE'),
+																			STATUS = request.POST.get('STATUS'),
+																			)
+				except Exception as e:
+					transaction.rollback()
+					errores['administrador'] = e
+					ctx = {'clientes':clientes,'errores':errores}
+
+					return render(request,'Vista_Cliente.html',ctx)
+				else:
+					transaction.commit()
+					
+					
+					return HttpResponseRedirect(reverse('app_CCDev:Vista_Cliente')+"?ok")
+			else:
+				ctx = {'clientes':clientes,'errores':errores}
+				return render(request,'Vista_Cliente.html',ctx)
+		else:
+			ctx = {'clientes':clientes}
+			return render(request,'Modificar_Cliente.html',ctx)
+	else: 
+		return redirect('app_CCDev:principal')
+
+#Eliminar cliente
+@login_required
+def Eliminar_cliente(request,id_cliente):
+	eliminar = CLIENT.objects.get(pk=id_cliente).delete()
+	return HttpResponseRedirect(reverse('app_CCDev:Vista_Cliente'))
+
 # Registro Vista Cuenta de banco
+@login_required
 def Vista_CBanco(request):
 	Cuentas = ACCOUNT_BANK.objects.all()
 	# CAPIClient(request)
-	# CAPIACCOUNT_BANK(request)
+	CAPIACCOUNT_BANK(request)
 	if request.user.is_superuser:
 		query_CBanck,errores = {},{}
 
@@ -246,6 +295,55 @@ def Vista_CBanco(request):
 	else:
 		return redirect('app_CCDev:principal')	
 
+# Modificar Account Bank
+@login_required
+def Modificar_CBanco(request,id_ACCOUNT_BANK):
+	if request.user.is_superuser:
+		
+		errores = {}
+		ABanck = ACCOUNT_BANK.objects.filter(ID=id_ACCOUNT_BANK)
+		
+		if request.method == 'POST':
+
+			if request.POST.get('DATES') == '' or request.POST.get('DESCR') == '' or request.POST.get('ID_CLIENT') == '' or request.POST.get('TYPE') == '' or request.POST.get('TYPE') == '':
+				errores['NAME'] = "HAY ERRORES"
+
+			if not errores:	
+				try:
+					cliente = ACCOUNT_BANK.objects.filter(ID=id_ACCOUNT_BANK).update(
+																			DATES = request.POST.get('DATES'),
+																			DESCR = request.POST.get('DESCR'),
+																			ID_CLIENT = request.POST.get('ID_CLIENT'),
+																			TYPE = request.POST.get('TYPE'),
+																			DEBT = request.POST.get('DEBT'),
+																			CRED = request.POST.get('CRED'),
+																			BALANCE = request.POST.get('BALANCE'),
+																			)
+				except Exception as e:
+					transaction.rollback()
+					errores['administrador'] = e
+					ctx = {'ABanck':ABanck,'errores':errores}
+
+					return render(request,'Modificar_CBanco.html',ctx)
+				else:
+					transaction.commit()
+					
+					
+					return HttpResponseRedirect(reverse('app_CCDev:Vista_CBanco')+"?ok")
+			else:
+				ctx = {'ABanck':ABanck,'errores':errores}
+				return render(request,'Modificar_CBanco.html',ctx)
+		else:
+			ctx = {'ABanck':ABanck}
+			return render(request,'Modificar_CBanco.html',ctx)
+	else: 
+		return redirect('app_CCDev:principal')
+
+#Eliminar cuenta de Banco
+@login_required
+def Eliminar_ACCOUNT_BANK(request,id_ACCOUNT_BANK):
+	eliminar = ACCOUNT_BANK.objects.filter(ID=id_ACCOUNT_BANK).delete()
+	return HttpResponseRedirect(reverse('app_CCDev:Vista_CBanco'))
 
 # Envio de Api
 #API CLIENTE
@@ -262,11 +360,16 @@ class ApisendCLIENT(APIView):
 			return Response(ctx)
 
 def CAPIClient(request):
-	url = requests.get('http://127.0.0.1:8000/vista/ApisendCLIENT')
+	query_CLEINT,errores = {},{}
+	url = requests.get('https://radiant-journey-28507.herokuapp.com/buscarClientes.php')
+	# url2 = requests.get('https://radiant-journey-28507.herokuapp.com/buscarClientes.php')
 	
 	if url.status_code == 200:
 		Data = url.json()
+		# Data2 = url2.json()
+		
 		ApiData = Data['clientes']
+		# ApiData2 = Data2['clientes']
 		for i in range(0,len(ApiData)):
 			
 			a = ApiData[i]
@@ -282,8 +385,49 @@ def CAPIClient(request):
 				print('existe ese id')
 			else:
 				print('no existe, se almacenara')
-		
+				# ID
+				if type(id) != str:
+					errores['id'] = "El ID no es un string"
+				else:
+					query_CLEINT['ID'] = id
+				# NAME
+				if type(nombre) != str:
+					errores['NAME'] = "El nombre no es un string"
+				else:
+					query_CLEINT['NAME'] = nombre
+				# ORIGIN
+				if type(origen) != str:
+					errores['ORIGIN'] = "El origen no es un string"
+				else:
+					query_CLEINT['ORIGIN'] = origen
+				# AGE
+				if type(edad) != int:
+					errores['AGE'] = "La edad no es un entero"
+				else:
+					query_CLEINT['AGE'] = edad
+				# STATUS
+				if type(estado) != str:
+					errores['STATUS'] = "El estado no es un string"
+				else:
+					query_CLEINT['STATUS'] = estado
+				print(errores)
 
+				if not errores:
+					cliente = CLIENT(**query_CLEINT)
+					cliente.save()
+
+class UpdateCLIENT(APIView):
+	ctx = {}
+	
+	def get(self, request, format=None):
+		clientes = list(CLIENT.objects.filter(ID=id_cl).values('ID','NAME','ORIGIN','AGE','STATUS'))
+		print("Esta es la api",clientes)
+		if clientes:
+			ctx = {'clientes':clientes}
+			return Response(ctx)
+		else:
+			ctx = {'error','No hay actualizaciones'}
+			return Response(ctx)		
 
 #API ACCOUNT_BANK
 class ApisendACCOUNT_BANK(APIView):
@@ -300,7 +444,9 @@ class ApisendACCOUNT_BANK(APIView):
 
 #API captura de datos de ACCOUNT BANK
 def CAPIACCOUNT_BANK(request):
-	url = requests.get('http://127.0.0.1:8000/vista/ApisendACCOUNT_BANK')
+	query_CLEINT,errores = {},{}
+	url = requests.get('https://radiant-journey-28507.herokuapp.com/buscarBancos.php')
+	# url2 = requests.get('https://radiant-journey-28507.herokuapp.com/buscarBancos.php')
 	
 	if url.status_code == 200:
 		Data = url.json()
@@ -317,9 +463,55 @@ def CAPIACCOUNT_BANK(request):
 			credito = a['CRED']
 			balance = a['BALANCE']
 			print(type(id))
-			print(type(balance))
+			print(type(float(balance)))
 
 			if ACCOUNT_BANK.objects.filter(ID = id).exists():
 				print('existe ese id')
 			else:
 				print('no existe, se almacenara')
+				# ID
+				if type(id) != str:
+					errores['ID'] = "El ID no es un string"
+				else:
+					query_CLEINT['ID'] = id
+				# DATES
+				if type(datos) != str:
+					errores['DATES'] = "los Datos no es un string"
+				else:
+					query_CLEINT['DATES'] = datos
+				# DESCR
+				if type(descripcion) != str:
+					errores['DESCR'] = "La descripcion no es un string"
+				else:
+					query_CLEINT['DESCR'] = descripcion
+				# ID_CLIENT
+				if type(cliente) != str:
+					errores['ID_CLIENT'] = "El cliente no es un string"
+				else:
+					query_CLEINT['ID_CLIENT'] = cliente 
+				# TYPE
+				if type(estado) != str:
+					errores['TYPE'] = "El tipo no es un string"
+				else:
+					query_CLEINT['TYPE'] = estado
+				# DEBT
+				if type(debito) != float:
+					errores['DEBT'] = "El debito no es un float"
+				else:
+					query_CLEINT['DEBT'] = debito
+				# CRED
+				if type(credito) != float:
+					errores['CRED'] = "El credito no es un float"
+				else:
+					query_CLEINT['CRED'] = debito 
+				# BALANCE
+				if type(balance) != float:
+					errores['BALANCE'] = "El balance no es un float"
+				else:
+					query_CLEINT['BALANCE'] = balance
+				
+				print(errores)
+				if not errores:
+					Ccuenta = ACCOUNT_BANK(**query_CBanck)
+					Ccuenta.save()
+				

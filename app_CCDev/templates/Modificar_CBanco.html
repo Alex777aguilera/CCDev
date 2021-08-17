@@ -1,0 +1,131 @@
+{% extends "Principal_blank.html" %}
+{% block titulo %}
+CC-DEV | Modificar Cuenta Banco
+{% endblock titulo %}
+{% load static %}
+{% block content %}
+{% for CB in ABanck %}
+    <!-- ======= Cta Section ======= -->
+    <section id="cta" class="cta">
+      <div class="container">
+
+        <div class="row" data-aos="zoom-out">
+          <div class="col-md-9 text-center text-lg-start">
+            <h3>{{CB.DATES}} || {{CB.ID}}</h3>
+            
+          </div>
+        </div>
+
+      </div>
+    </section><!-- End Cta Section -->
+    
+
+
+
+<section id="services" class="contact">
+    <div class="container">
+        <div class="row mt-5">
+            <div class="col-lg-11 mt-5 mt-lg-0" data-aos="fade-left">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">{{CB.DATES}} || Cuenta de {{CB.ID_CLIENT}}</h3>
+                        </div>
+                        
+                        
+                        <!-- /.card-header -->
+                        <div class="card-body">
+                        <!-- Button trigger modal -->
+                           <form action="#" method="post" role="form" >
+                {% csrf_token %}
+                    <div class="row">
+                        
+                        
+                        <div class="mb-3 col-md-6 ">
+                            <label for="exampleInputEmail1" class="form-label">Datos <i class="fas fa-asterisk text-danger"></i></label>
+                            <input type="text" class="form-control" name="DATES" id="exampleInputEmail1" aria-describedby="emailHelp"value="{{CB.DATES}}">
+                            
+                        </div>
+                        <div class="mb-3 col-md-3 ">
+                            <label for="exampleInputEmail1" class="form-label">Descripcion <i class="fas fa-asterisk text-danger"></i></label>
+                            <input type="text" class="form-control" name="DESCR" id="exampleInputEmail1" aria-describedby="emailHelp"value="{{CB.DESCR}}">
+                            
+                        </div>
+                        
+                    </div> 
+                    <div class="row">
+                        <div class="mb-3 col-md-3 ">
+                            <label for="exampleInputEmail1" class="form-label">Cliente <i class="fas fa-asterisk text-danger"></i></label>
+                            <input type="text" class="form-control" name="ID_CLIENT" id="exampleInputEmail1" aria-describedby="emailHelp"value="{{CB.ID_CLIENT}}">
+                            
+                        </div>
+                        <div class="mb-3 col-md-3 ">
+                            <label for="exampleInputEmail1" class="form-label">Tipo <i class="fas fa-asterisk text-danger"></i></label>
+                            <input type="text" class="form-control" name="TYPE" id="exampleInputEmail1" aria-describedby="emailHelp" value="{{CB.TYPE}}">
+                            
+                        </div>
+                    </div>    
+                    <div class="row">
+                        <div class="mb-3 col-md-3 ">
+                            <label for="exampleInputEmail1" class="form-label">Debito <i class="fas fa-asterisk text-danger"></i></label>
+                            <input type="text" class="form-control" name="DEBT" id="exampleInputEmail1" aria-describedby="emailHelp"value="{{CB.DEBT}}">
+                            
+                        </div>
+                        <div class="mb-3 col-md-3 ">
+                            <label for="exampleInputEmail1" class="form-label">Credito <i class="fas fa-asterisk text-danger"></i></label>
+                            <input type="text" class="form-control" name="CRED" id="exampleInputEmail1" aria-describedby="emailHelp" value="{{CB.CRED}}">
+                            
+                        </div>
+                        <div class="mb-3 col-md-3 ">
+                            <label for="exampleInputEmail1" class="form-label">Balance <i class="fas fa-asterisk text-danger"></i></label>
+                            <input type="text" class="form-control" name="BALANCE" id="exampleInputEmail1" aria-describedby="emailHelp" value="{{CB.BALANCE}}">
+                            
+                        </div>
+                    </div>            
+            </div>
+                <div class="modal-footer">
+                    
+                    <button type="submit" class="btn btn-warning text-white" data-bs-toggle="tooltip" data-bs-placement="bottom">Registrar</button>
+                    
+                </div>
+            </form>
+                        </div>    
+                    </div>
+                    
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+ </section><!-- End Contact Section -->
+    {% endfor %}                              
+{% endblock content %}
+
+{% block js %}
+<script>
+
+
+ /*
+{% if 'ok' in request.GET %}
+    alertify.success('Datos guardados con éxito.!!');
+{% endif %}
+
+{% if errores.existe %}
+    alertify.error('Registro ya existente!!');
+{% endif %}
+
+{% if errores.ID %}
+    alertify.error('Debe ingresar El ID');
+{% elif errores.NAME %}
+    alertify.error('Debe ingresar el nombre');
+{% elif errores.ORIGIN %}
+    alertify.error('Debe ingresar el origen');
+{% elif errores.AGE %}
+    alertify.error('Debe ingresar la edad');
+{% elif errores.STATUS %}
+    alertify.error('Debe ingresar el estado');
+{% endif %}
+*/
+</script>
+{% endblock js %}

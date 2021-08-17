@@ -118,6 +118,8 @@ CC-DEV | Cuenta Bancaria
                                         <th>Debito</th>
                                         <th>Credito</th>
                                         <th>Balance</th>
+                                        <th>Modificar</th>
+                                        <th>Eliminar</th>
                                         
                                     </tr>
                                 </thead>
@@ -134,6 +136,20 @@ CC-DEV | Cuenta Bancaria
                                             <td>{{cuentas.DEBT}}</td>
                                             <td>{{cuentas.CRED}}</td>
                                             <td>{{cuentas.BALANCE}}</td>
+                                            <td>
+                                                <center>
+                                                <button type="button" class="btn btn-success btn-sm">
+                                                   <a class="text-light" href="{% url 'app_CCDev:Modificar_CBanco' cuentas.ID %}"><i class="fas fa-edit"></i></a>
+                                                </button>
+                                                </center>
+                                            </td>
+                                             <td>
+                                                <center>
+                                                <button type="button" class="btn btn-danger btn-sm">
+                                                   <a class="text-light" href="{% url 'app_CCDev:Eliminar_ACCOUNT_BANK' cuentas.ID %}"><i class="fas fa-trash-alt"></i></a>
+                                                </button>
+                                                </center>
+                                            </td>
                                             
                                         </tr>
                                     {% empty %}

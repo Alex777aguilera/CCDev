@@ -66,7 +66,7 @@ class CLIENT(models.Model):
     STATUS = models.CharField(max_length=10, null= False,blank=False)
 
     def __str__(self):
-        return "{}-{}".format(self.ID,self.NAME,self.STATUS)
+        return "{}-{}-{}".format(self.ID,self.NAME,self.STATUS)
 
 class ACCOUNT_BANK(models.Model):
     ID = models.CharField(max_length=100, primary_key=True)

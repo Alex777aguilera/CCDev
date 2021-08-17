@@ -4271,7 +4271,7 @@
     clickCallback: '(function|null)'
   };
   const NAME$7 = 'backdrop';
-  const CLASS_NAME_BACKDROP = 'modal-backdrop';
+  
   const CLASS_NAME_FADE$5 = 'fade';
   const CLASS_NAME_SHOW$6 = 'show';
   const EVENT_MOUSEDOWN = `mousedown.bs.${NAME$7}`;
