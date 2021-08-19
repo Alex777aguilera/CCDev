@@ -6,6 +6,7 @@ from django.db import transaction,connections #manejo de base de datos
 import json, re, os
 from app_CCDev.models import *
 from django.contrib.auth.decorators import login_required, permission_required
+from django.utils.decorators import method_decorator
 from django.core import serializers
 from django.contrib.auth.hashers import make_password
 import requests
@@ -102,7 +103,7 @@ def Vista_Tcuenta(request):
 @login_required
 def Vista_Cliente(request):
 	Clients = CLIENT.objects.all()
-	CAPIClient(request)
+	# CAPIClient(request)
 	# CAPIACCOUNT_BANK(request)
 	if request.user.is_superuser:
 		query_CLEINT,errores = {},{}
@@ -215,7 +216,7 @@ def Eliminar_cliente(request,id_cliente):
 def Vista_CBanco(request):
 	Cuentas = ACCOUNT_BANK.objects.all()
 	# CAPIClient(request)
-	CAPIACCOUNT_BANK(request)
+	# CAPIACCOUNT_BANK(request)
 	if request.user.is_superuser:
 		query_CBanck,errores = {},{}
 
@@ -349,7 +350,11 @@ def Eliminar_ACCOUNT_BANK(request,id_ACCOUNT_BANK):
 #API CLIENTE
 class ApisendCLIENT(APIView):
 	ctx = {}
-	def get(self, request, format=None):
+	# @method_decorator
+	# def dispatch(self, request, *args, **kwargs):
+	# 	return super().dispatch(request, *args, **kwargs)
+	
+	def get(self, request, format=None,id_CLIENT=""):
 		clientes = list(CLIENT.objects.all().values('ID','NAME','ORIGIN','AGE','STATUS'))
 		
 		if clientes:
@@ -358,6 +363,89 @@ class ApisendCLIENT(APIView):
 		else:
 			ctx = {'error','No hay Registros'}
 			return Response(ctx)
+	def post(self, request, format=None): 
+		query_CLEINT,errores, ctx = {},{},{}
+		if  request.method == 'POST':
+			
+			# print(request.body)
+			Data = json.loads(request.body)
+
+			
+			id = Data['ID']
+			nombre = Data['NAME']
+			origen = Data['ORIGIN']
+			edad = Data['AGE']
+			estado = Data['STATUS']
+
+			if CLIENT.objects.filter(ID = id).exists():
+				ctx = {'Sussces','existe ese id'}
+				
+			else:
+				
+				# ID
+				if type(id) != str:
+					errores['id'] = "El ID no es un string"
+				else:
+					query_CLEINT['ID'] = id
+				# NAME
+				if type(nombre) != str:
+					errores['NAME'] = "El nombre no es un string"
+				else:
+					query_CLEINT['NAME'] = nombre
+				# ORIGIN
+				if type(origen) != str:
+					errores['ORIGIN'] = "El origen no es un string"
+				else:
+					query_CLEINT['ORIGIN'] = origen
+				# AGE
+				if type(edad) != int:
+					errores['AGE'] = "La edad no es un entero"
+				else:
+					query_CLEINT['AGE'] = edad
+				# STATUS
+				if type(estado) != str:
+					errores['STATUS'] = "El estado no es un string"
+				else:
+					query_CLEINT['STATUS'] = estado
+				print(errores)
+
+				if not errores:
+					ctx = {'Sussces','Se almaceno con exito'}
+					cliente = CLIENT(**query_CLEINT)
+					cliente.save()
+				else:
+					ctx = {'error': errores}
+			return Response(ctx)
+	def put(self, request,id_CLIENT):
+		if  request.method == 'PUT':
+			if CLIENT.objects.filter(ID=id_CLIENT).exists():
+				Data = json.loads(request.body)
+				
+				nombre = Data['NAME']
+				origen = Data['ORIGIN']
+				edad = Data['AGE']
+				estado = Data['STATUS']
+				
+				cliente = CLIENT.objects.filter(ID=id_CLIENT).update(
+																					NAME = nombre,
+																					ORIGIN = origen,
+																					AGE = edad,
+																					STATUS = estado ,
+																					)
+				ctx = {'Sussces','Datos modificados'}
+				return Response(ctx)
+			else:
+				ctx = {'Error','ID no existente'}
+				return Response(ctx)
+	def delete(self, request,id_CLIENT):
+		if request.method == 'DELETE':
+			if CLIENT.objects.filter(ID=id_CLIENT).exists():
+				eliminar = CLIENT.objects.filter(ID=id_CLIENT).delete()
+				ctx = {'Sussces','Registro Eliminado'}
+				return Response(ctx)
+			else:
+				ctx = {'Error','ID no existente'}
+				return Response(ctx)
 
 def CAPIClient(request):
 	query_CLEINT,errores = {},{}
@@ -416,31 +504,122 @@ def CAPIClient(request):
 					cliente = CLIENT(**query_CLEINT)
 					cliente.save()
 
-class UpdateCLIENT(APIView):
-	ctx = {}
-	
-	def get(self, request, format=None):
-		clientes = list(CLIENT.objects.filter(ID=id_cl).values('ID','NAME','ORIGIN','AGE','STATUS'))
-		print("Esta es la api",clientes)
-		if clientes:
-			ctx = {'clientes':clientes}
-			return Response(ctx)
-		else:
-			ctx = {'error','No hay actualizaciones'}
-			return Response(ctx)		
 
 #API ACCOUNT_BANK
 class ApisendACCOUNT_BANK(APIView):
 	ctx = {}
-	def get(self, request, format=None):
+	def get(self, request, format=None,id_CB=""):
 		CBancos = list(ACCOUNT_BANK.objects.all().values('ID','DATES','DESCR','ID_CLIENT','TYPE','DEBT','CRED','BALANCE'))
-		
+		print(id_CB)
 		if CBancos:
 			ctx = {'CBancos':CBancos}
 			return Response(ctx)
 		else:
 			ctx = {'error','No hay Registros'}
 			return Response(ctx)
+	def post(self, request, format=None): 
+		query_CBanck,errores, ctx = {},{},{}
+		if  request.method == 'POST':
+			
+			Data = json.loads(request.body)
+			id = Data['ID']
+			datos = Data['DATES']
+			descripcion = Data['DESCR']
+			cliente = Data['ID_CLIENT']
+			estado = Data['TYPE']
+			debito = Data['DEBT']
+			credito = Data['CRED']
+			balance = Data['BALANCE']
+			if ACCOUNT_BANK.objects.filter(ID = id).exists():
+				ctx = {'Sussces','existe ese id'}
+			else:
+				
+				# ID
+				if type(id) != str:
+					errores['ID'] = "El ID no es un string"
+				else:
+					query_CBanck['ID'] = id
+				# DATES
+				if type(datos) != str:
+					errores['DATES'] = "los Datos no es un string"
+				else:
+					query_CBanck['DATES'] = datos
+				# DESCR
+				if type(descripcion) != str:
+					errores['DESCR'] = "La descripcion no es un string"
+				else:
+					query_CBanck['DESCR'] = descripcion
+				# ID_CLIENT
+				if type(cliente) != str:
+					errores['ID_CLIENT'] = "El cliente no es un string"
+				else:
+					query_CBanck['ID_CLIENT'] = cliente 
+				# TYPE
+				if type(estado) != str:
+					errores['TYPE'] = "El tipo no es un string"
+				else:
+					query_CBanck['TYPE'] = estado
+				# DEBT
+				if type(debito) != float:
+					errores['DEBT'] = "El debito no es un float"
+				else:
+					query_CBanck['DEBT'] = debito
+				# CRED
+				if type(credito) != float:
+					errores['CRED'] = "El credito no es un float"
+				else:
+					query_CBanck['CRED'] = debito 
+				# BALANCE
+				if type(balance) != float:
+					errores['BALANCE'] = "El balance no es un float"
+				else:
+					query_CBanck['BALANCE'] = balance
+				
+				print(errores)
+				if not errores:
+					Ccuenta = ACCOUNT_BANK(**query_CBanck)
+					Ccuenta.save()
+					ctx = {'Sussces','Se almaceno con exito'}
+				else:
+					ctx = {'Error':errores}
+			return Response(ctx)
+	def put(self, request,id_CB):
+		if request.method == 'PUT':
+			if ACCOUNT_BANK.objects.filter(ID = id_CB).exists():
+				Data = json.loads(request.body)
+
+				
+				datos = Data['DATES']
+				descripcion = Data['DESCR']
+				cliente = Data['ID_CLIENT']
+				estado = Data['TYPE']
+				debito = Data['DEBT']
+				credito = Data['CRED']
+				balance = Data['BALANCE']
+
+				cbanco = ACCOUNT_BANK.objects.filter(ID=id_CB).update(
+																			DATES = datos,
+																			DESCR = descripcion,
+																			ID_CLIENT = cliente,
+																			TYPE = estado,
+																			DEBT = debito,
+																			CRED = credito,
+																			BALANCE = balance,
+																			)
+				ctx = {'Sussces','Datos modificados'}
+				return Response(ctx)
+			else:
+				ctx = {'Error','ID no existente'}
+				return Response(ctx)
+	def delete(self, request,id_CB):
+		if request.method == 'DELETE':
+			if  ACCOUNT_BANK.objects.filter(ID = id_CB).exists():
+				eliminar = ACCOUNT_BANK.objects.filter(ID=id_CB).delete()
+				ctx = {'Sussces','Registro Eliminado'}
+				return Response(ctx)
+			else:
+				ctx = {'Error','ID no existente'}
+				return Response(ctx)
 
 #API captura de datos de ACCOUNT BANK
 def CAPIACCOUNT_BANK(request):

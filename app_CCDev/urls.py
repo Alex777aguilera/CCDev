@@ -8,10 +8,14 @@ urlpatterns = [
  path('', views.principal, name='principal'),
  path('vista/data', views.otra_view, name='otra_view'),	
 #  Envio de api 
+#Api cliente
  path('vista/ApiCliente', views.Apisend.as_view(), name='ApiSend'),	
- path('vista/UpdateApiCliente', views.UpdateCLIENT.as_view(), name='UpdateCLIENT'),	#update
+ ##	
  path('vista/ApisendCLIENT', views.ApisendCLIENT.as_view(), name='ApisendCLIENT'),	
+ path('vista/ApisendCLIENT/<str:id_CLIENT>/', views.ApisendCLIENT.as_view(), name='Process'),	
+ #Api Cuenta de banco
  path('vista/ApisendACCOUNT_BANK', views.ApisendACCOUNT_BANK.as_view(), name='ApisendACCOUNT_BANK'),	
+ path('vista/ApisendACCOUNT_BANK/<str:id_CB>/', views.ApisendACCOUNT_BANK.as_view(), name='ProcesBanck'),	
 # Formularios 
 #Cliente
  path('vista/Tipo/Cuenta', views.Vista_Tcuenta, name='Vista_Tcuenta'),	
