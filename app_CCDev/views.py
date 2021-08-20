@@ -132,7 +132,7 @@ def Vista_Cliente(request):
 			if request.POST.get('AGE') == '':
 				errores['AGE'] = "Debe ingresar la edad"
 			else:
-				query_CLEINT['AGE'] = request.POST.get('AGE')
+				query_CLEINT['AGE'] = int(request.POST.get('AGE'))
 			# STATUS
 			if request.POST.get('STATUS') == '':
 				errores['STATUS'] = "Debe ingresar el estado"
@@ -140,10 +140,20 @@ def Vista_Cliente(request):
 				query_CLEINT['STATUS'] = request.POST.get('STATUS')
 
 			print(errores)
-
+ 
 			if not errores:
 				try:
 					cliente = CLIENT(**query_CLEINT)
+					
+					# response = requests.post('https://radiant-journey-28507.herokuapp.com/buscarClientes.php', json = query_CLEINT)
+					
+					print(query_CLEINT)
+					response = ''
+					response = requests.post('https://radiant-journey-28507.herokuapp.com/api.php', json = query_CLEINT)
+					
+					if response.status_code == 200:
+						Data = response.json()
+					# 	print(Data)
 					cliente.save()
 					
 				except Exception as e:
@@ -185,6 +195,19 @@ def modificar_CLIENT(request,id_CLIENT):
 																			AGE = request.POST.get('AGE'),
 																			STATUS = request.POST.get('STATUS'),
 																			)
+					clu = {"ID":str(id_CLIENT),
+						  "Name":request.POST.get('NAME'),
+						  "ORIGIN":request.POST.get('ORIGIN'),
+						  "AGE":int(request.POST.get('AGE')),
+						  "STATUS":request.POST.get('STATUS')
+						}
+					response = ''
+					response = requests.put('https://radiant-journey-28507.herokuapp.com/api.php', json = clu)
+					
+					if response.status_code == 200:
+						Data = response.json()
+						print(Data)
+
 				except Exception as e:
 					transaction.rollback()
 					errores['administrador'] = e
@@ -208,7 +231,16 @@ def modificar_CLIENT(request,id_CLIENT):
 #Eliminar cliente
 @login_required
 def Eliminar_cliente(request,id_cliente):
+	ctx={}
 	eliminar = CLIENT.objects.get(pk=id_cliente).delete()
+	ctx = {"id":id_cliente}
+	response = ''
+	response = requests.delete('https://radiant-journey-28507.herokuapp.com/api.php', json = ctx)
+	
+	if response.status_code == 200:
+		Data = response.json()
+		print(Data)
+
 	return HttpResponseRedirect(reverse('app_CCDev:Vista_Cliente'))
 
 # Registro Vista Cuenta de banco
@@ -254,13 +286,13 @@ def Vista_CBanco(request):
 			if request.POST.get('DEBT') == '':
 				errores['DEBT'] = "Debe ingresar el debito"
 			else:
-				query_CBanck['DEBT'] = request.POST.get('DEBT')
+				query_CBanck['DEBT'] = float(request.POST.get('DEBT'))
 				debito = float(request.POST.get('DEBT'))
 			# CRED
 			if request.POST.get('CRED') == '':
 				errores['CRED'] = "Debe ingresar el credito"
 			else:
-				query_CBanck['CRED'] = request.POST.get('CRED')
+				query_CBanck['CRED'] = float(request.POST.get('CRED'))
 				credito = float(request.POST.get('CRED'))
 			# BALANCE
 			balance = (credito - debito)
@@ -268,12 +300,18 @@ def Vista_CBanco(request):
 				errores['BALANCE'] = "Debito sobrepasa al credito!!"
 			else:
 				query_CBanck['BALANCE'] = float(balance)
-				print(query_CBanck['BALANCE'])
+				
 			
 
 			if not errores:
 				try:
 					Ccuenta = ACCOUNT_BANK(**query_CBanck)
+					response = ''
+					response = requests.post('https://ccdevp.herokuapp.com/vista/ApisendACCOUNT_BANK', json = query_CBanck)
+					
+					if response.status_code == 200:
+						Data = response.json()
+						print(Data)
 					Ccuenta.save()
 					
 				except Exception as e:
@@ -350,9 +388,6 @@ def Eliminar_ACCOUNT_BANK(request,id_ACCOUNT_BANK):
 #API CLIENTE
 class ApisendCLIENT(APIView):
 	ctx = {}
-	# @method_decorator
-	# def dispatch(self, request, *args, **kwargs):
-	# 	return super().dispatch(request, *args, **kwargs)
 	
 	def get(self, request, format=None,id_CLIENT=""):
 		clientes = list(CLIENT.objects.all().values('ID','NAME','ORIGIN','AGE','STATUS'))
@@ -416,17 +451,18 @@ class ApisendCLIENT(APIView):
 				else:
 					ctx = {'error': errores}
 			return Response(ctx)
-	def put(self, request,id_CLIENT):
+	def put(self, request):
 		if  request.method == 'PUT':
-			if CLIENT.objects.filter(ID=id_CLIENT).exists():
-				Data = json.loads(request.body)
+			Data = json.loads(request.body)
+			idC = Data['ID']
+			if CLIENT.objects.filter(ID=idC).exists():
 				
 				nombre = Data['NAME']
 				origen = Data['ORIGIN']
 				edad = Data['AGE']
 				estado = Data['STATUS']
 				
-				cliente = CLIENT.objects.filter(ID=id_CLIENT).update(
+				cliente = CLIENT.objects.filter(ID=idC).update(
 																					NAME = nombre,
 																					ORIGIN = origen,
 																					AGE = edad,
@@ -437,10 +473,12 @@ class ApisendCLIENT(APIView):
 			else:
 				ctx = {'Error','ID no existente'}
 				return Response(ctx)
-	def delete(self, request,id_CLIENT):
+	def delete(self, request):
 		if request.method == 'DELETE':
-			if CLIENT.objects.filter(ID=id_CLIENT).exists():
-				eliminar = CLIENT.objects.filter(ID=id_CLIENT).delete()
+			Data = json.loads(request.body)
+			idC = Data['ID']
+			if CLIENT.objects.filter(ID=idC).exists():
+				eliminar = CLIENT.objects.filter(ID=idC).delete()
 				ctx = {'Sussces','Registro Eliminado'}
 				return Response(ctx)
 			else:
@@ -583,9 +621,11 @@ class ApisendACCOUNT_BANK(APIView):
 				else:
 					ctx = {'Error':errores}
 			return Response(ctx)
-	def put(self, request,id_CB):
+	def put(self, request):
 		if request.method == 'PUT':
-			if ACCOUNT_BANK.objects.filter(ID = id_CB).exists():
+			Data = json.loads(request.body)
+			idAb = Data['ID']
+			if ACCOUNT_BANK.objects.filter(ID = idAb).exists():
 				Data = json.loads(request.body)
 
 				
@@ -597,7 +637,7 @@ class ApisendACCOUNT_BANK(APIView):
 				credito = Data['CRED']
 				balance = Data['BALANCE']
 
-				cbanco = ACCOUNT_BANK.objects.filter(ID=id_CB).update(
+				cbanco = ACCOUNT_BANK.objects.filter(ID=idAb).update(
 																			DATES = datos,
 																			DESCR = descripcion,
 																			ID_CLIENT = cliente,
@@ -611,10 +651,12 @@ class ApisendACCOUNT_BANK(APIView):
 			else:
 				ctx = {'Error','ID no existente'}
 				return Response(ctx)
-	def delete(self, request,id_CB):
+	def delete(self, request):
 		if request.method == 'DELETE':
-			if  ACCOUNT_BANK.objects.filter(ID = id_CB).exists():
-				eliminar = ACCOUNT_BANK.objects.filter(ID=id_CB).delete()
+			Data = json.loads(request.body)
+			idAb = Data['ID']
+			if  ACCOUNT_BANK.objects.filter(ID = idAb).exists():
+				eliminar = ACCOUNT_BANK.objects.filter(ID=idAb).delete()
 				ctx = {'Sussces','Registro Eliminado'}
 				return Response(ctx)
 			else:
