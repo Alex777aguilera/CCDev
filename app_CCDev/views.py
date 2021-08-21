@@ -307,11 +307,11 @@ def Vista_CBanco(request):
 				try:
 					Ccuenta = ACCOUNT_BANK(**query_CBanck)
 					response = ''
-					response = requests.post('https://ccdevp.herokuapp.com/vista/ApisendACCOUNT_BANK', json = query_CBanck)
+					response = requests.post('https://radiant-journey-28507.herokuapp.com/api_banco.php', json = query_CBanck)
 					
 					if response.status_code == 200:
 						Data = response.json()
-						print(Data)
+						#print(Data)
 					Ccuenta.save()
 					
 				except Exception as e:
@@ -358,6 +358,20 @@ def Modificar_CBanco(request,id_ACCOUNT_BANK):
 																			CRED = request.POST.get('CRED'),
 																			BALANCE = request.POST.get('BALANCE'),
 																			)
+					jucb = {"ID": str(id_ACCOUNT_BANK),
+     						"DATES": request.POST.get('DATES'),
+      						"DESCR": request.POST.get('DESCR'),
+      						"ID_CLIENT": request.POST.get('ID_CLIENT'),
+     						"TYPE": request.POST.get('TYPE'),
+     						"DEBT": request.POST.get('DEBT'),
+      						"CRED": request.POST.get('CRED'),
+      						"BALANCE": request.POST.get('BALANCE')}
+					response = ''
+					response = requests.put('https://radiant-journey-28507.herokuapp.com/api_banco.php', json = jucb)
+					
+					if response.status_code == 200:
+						Data = response.json()
+						#print(Data)
 				except Exception as e:
 					transaction.rollback()
 					errores['administrador'] = e
@@ -381,7 +395,15 @@ def Modificar_CBanco(request,id_ACCOUNT_BANK):
 #Eliminar cuenta de Banco
 @login_required
 def Eliminar_ACCOUNT_BANK(request,id_ACCOUNT_BANK):
+	ctx={}
 	eliminar = ACCOUNT_BANK.objects.filter(ID=id_ACCOUNT_BANK).delete()
+	ctx = {"id":id_ACCOUNT_BANK}
+	response = ''
+	response = requests.delete('https://radiant-journey-28507.herokuapp.com/api_banco.php', json = ctx)
+	
+	if response.status_code == 200:
+		Data = response.json()
+		# print(Data)
 	return HttpResponseRedirect(reverse('app_CCDev:Vista_CBanco'))
 
 # Envio de Api
@@ -565,9 +587,9 @@ class ApisendACCOUNT_BANK(APIView):
 			descripcion = Data['DESCR']
 			cliente = Data['ID_CLIENT']
 			estado = Data['TYPE']
-			debito = Data['DEBT']
-			credito = Data['CRED']
-			balance = Data['BALANCE']
+			debito = float(Data['DEBT'])
+			credito = float(Data['CRED'])
+			balance = float(Data['BALANCE'])
 			if ACCOUNT_BANK.objects.filter(ID = id).exists():
 				ctx = {'Sussces','existe ese id'}
 			else:
@@ -633,9 +655,9 @@ class ApisendACCOUNT_BANK(APIView):
 				descripcion = Data['DESCR']
 				cliente = Data['ID_CLIENT']
 				estado = Data['TYPE']
-				debito = Data['DEBT']
-				credito = Data['CRED']
-				balance = Data['BALANCE']
+				debito = float(Data['DEBT'])
+				credito = float(Data['CRED'])
+				balance = float(Data['BALANCE'])
 
 				cbanco = ACCOUNT_BANK.objects.filter(ID=idAb).update(
 																			DATES = datos,
