@@ -65,7 +65,7 @@
           <li><a class="nav-link scrollto" href="#pricing">Pricing</a></li>
           <li><a class="nav-link scrollto" href="#team">Team</a></li>
           {% if request.user.is_authenticated and request.user.is_superuser %} 
-          <li class="dropdown"><a href="#"><span>Drop Down</span> <i class="bi bi-chevron-down"></i></a>
+          <li class="dropdown"><a href="#"><span>Api Opciones</span> <i class="bi bi-chevron-down"></i></a>
             <ul>
               <li><a href="{% url 'app_CCDev:otra_view' %}">Envio de API</a></li>
               <li class="dropdown"><a href="#"><span>Registros</span> <i class="bi bi-chevron-right"></i></a>
@@ -85,9 +85,9 @@
                   {% if request.user.is_authenticated %}
                     <li class="text-center">&nbsp&nbsp&nbsp&nbsp <i class="fas fa-user-circle"></i>  {{request.user}}</li>
                     <li><a href="#">Cuenta<i class="fas fa-user-alt"></i></a></li>
-                    <li><a href="#"> Salir <i class="fas fa-sign-out-alt "></i></a></li>
+                    <li><a href="{% url 'app_CCDev:cerrar_sesion' %}"> Salir <i class="fas fa-sign-out-alt "></i></a></li>
                   {% else %}
-                    <li><a href="#">Iniciar secion<i class="fas fa-user-alt"></i></a></li>
+                    <li><a href="{% url 'app_CCDev:login' %}">Iniciar secion<i class="fas fa-user-alt"></i></a></li>
                   {% endif %}
                 </ul>
           </li>

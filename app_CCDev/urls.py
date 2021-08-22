@@ -5,7 +5,9 @@ from . import views
 app_name = 'app_CCDev'
 
 urlpatterns = [
+ path('login',views.login,name="login"),
  path('', views.principal, name='principal'),
+ path('cerrar_sesion',views.cerrar_sesion,name="cerrar_sesion"),
  path('vista/data', views.otra_view, name='otra_view'),	
 #  Envio de api 
 #Api cliente

@@ -25,15 +25,33 @@ from rest_framework.parsers import JSONParser
 def principal(request):
 	return render(request,'principal_base.html')
 
-# def cerrar_sesion(request):
-# 	logout(request)
-# 	return HttpResponseRedirect(reverse('Iuth_app:login'))
+def cerrar_sesion(request):
+	logout(request)
+	return HttpResponseRedirect(reverse('app_CCDev:principal'))
 
-
+@login_required
 def otra_view(request):
 	CAPI(request)
 	return render(request,'inicio.html')
 
+def login(request):
+	mensaje=''
+	if request.method == 'POST':
+		username = request.POST.get('usuario')
+		contrasenia = request.POST.get('contrasenia')
+		user = authenticate(username=username,password=contrasenia)
+		if user is not None:
+			if user.is_active:
+				auth_login(request,user)
+				return redirect('app_CCDev:principal')
+			else:
+				mensaje = 'USUARIO INACTIVO'
+				return render(request,'lg.html',{'mensaje':mensaje})
+		else:
+			mensaje = 'USUARIO O CONTRASEÑA INCORRECTO'
+			return render(request,'lg.html',{'mensaje':mensaje})
+
+	return render(request,'lg.html')
 class Apisend(APIView):
 	ctx = {}
 	def get(self, request, format=None):
