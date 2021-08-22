@@ -6,8 +6,11 @@ from django.db import transaction,connections #manejo de base de datos
 import json, re, os
 from app_CCDev.models import *
 from django.contrib.auth.decorators import login_required, permission_required
-from django.utils.decorators import method_decorator
 from django.core import serializers
+
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
+
 from django.contrib.auth.hashers import make_password
 import requests
 
@@ -154,6 +157,13 @@ def Vista_Cliente(request):
 					if response.status_code == 200:
 						Data = response.json()
 					# 	print(Data)
+					# Api Grupo Java
+					response2 = ''
+					response2 = requests.post('http://167.99.158.191/api_cloud_computing/clientes.php', json = query_CLEINT)
+					
+					if response2.status_code == 200:
+						Data2 = response.json()
+						print(Data2)
 					cliente.save()
 					
 				except Exception as e:
@@ -196,7 +206,7 @@ def modificar_CLIENT(request,id_CLIENT):
 																			STATUS = request.POST.get('STATUS'),
 																			)
 					clu = {"ID":str(id_CLIENT),
-						  "Name":request.POST.get('NAME'),
+						  "NAME":request.POST.get('NAME'),
 						  "ORIGIN":request.POST.get('ORIGIN'),
 						  "AGE":int(request.POST.get('AGE')),
 						  "STATUS":request.POST.get('STATUS')
@@ -206,7 +216,14 @@ def modificar_CLIENT(request,id_CLIENT):
 					
 					if response.status_code == 200:
 						Data = response.json()
-						print(Data)
+						# print(Data)
+					# Api grup Java
+					response2 = ''
+					response2 = requests.put('http://167.99.158.191/api_cloud_computing/clientes.php', json = clu)
+					
+					if response2.status_code == 200:
+						Data2 = response.json()
+						print(Data2)
 
 				except Exception as e:
 					transaction.rollback()
@@ -231,7 +248,8 @@ def modificar_CLIENT(request,id_CLIENT):
 #Eliminar cliente
 @login_required
 def Eliminar_cliente(request,id_cliente):
-	ctx={}
+	ctx ={}
+	
 	eliminar = CLIENT.objects.get(pk=id_cliente).delete()
 	ctx = {"id":id_cliente}
 	response = ''
@@ -239,7 +257,18 @@ def Eliminar_cliente(request,id_cliente):
 	
 	if response.status_code == 200:
 		Data = response.json()
-		print(Data)
+		# print(Data)
+	# Api Grup Java
+	ctx2 ={}
+
+	ctx2 = {"ID":id_cliente}
+	response2 = ''
+	response2 = requests.delete('http://167.99.158.191/api_cloud_computing/clientes.php', json = ctx2)
+	
+	if response2.status_code == 200:
+		Data2 = response2.json()
+		print(Data2)
+
 
 	return HttpResponseRedirect(reverse('app_CCDev:Vista_Cliente'))
 
@@ -312,6 +341,12 @@ def Vista_CBanco(request):
 					if response.status_code == 200:
 						Data = response.json()
 						#print(Data)
+					response2 = ''
+					response2 = requests.post('http://167.99.158.191/api_cloud_computing/banco.php', json = query_CBanck)
+					
+					if response2.status_code == 200:
+						Data2 = response.json()
+						print(Data2)
 					Ccuenta.save()
 					
 				except Exception as e:
@@ -372,6 +407,12 @@ def Modificar_CBanco(request,id_ACCOUNT_BANK):
 					if response.status_code == 200:
 						Data = response.json()
 						#print(Data)
+					response2 = ''
+					response2 = requests.put('http://167.99.158.191/api_cloud_computing/banco.php', json = jucb)
+					
+					if response2.status_code == 200:
+						Data2 = response.json()
+						print(Data2)
 				except Exception as e:
 					transaction.rollback()
 					errores['administrador'] = e
@@ -395,7 +436,7 @@ def Modificar_CBanco(request,id_ACCOUNT_BANK):
 #Eliminar cuenta de Banco
 @login_required
 def Eliminar_ACCOUNT_BANK(request,id_ACCOUNT_BANK):
-	ctx={}
+	ctx,ctx2={},{}
 	eliminar = ACCOUNT_BANK.objects.filter(ID=id_ACCOUNT_BANK).delete()
 	ctx = {"id":id_ACCOUNT_BANK}
 	response = ''
@@ -404,12 +445,23 @@ def Eliminar_ACCOUNT_BANK(request,id_ACCOUNT_BANK):
 	if response.status_code == 200:
 		Data = response.json()
 		# print(Data)
+	ctx2 = {"ID":id_ACCOUNT_BANK}
+	response2 = ''
+	response2 = requests.delete('http://167.99.158.191/api_cloud_computing/banco.php', json = ctx2)
+					
+	if response2.status_code == 200:
+		Data2 = response.json()
+		print(Data2)
 	return HttpResponseRedirect(reverse('app_CCDev:Vista_CBanco'))
 
 # Envio de Api
 #API CLIENTE
 class ApisendCLIENT(APIView):
 	ctx = {}
+	@method_decorator(csrf_exempt)
+	def dispatch(self, request, *args, **kwargs):
+		return super().dispatch(request, *args, **kwargs)
+	
 	
 	def get(self, request, format=None,id_CLIENT=""):
 		clientes = list(CLIENT.objects.all().values('ID','NAME','ORIGIN','AGE','STATUS'))
