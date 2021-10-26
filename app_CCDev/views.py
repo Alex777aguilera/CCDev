@@ -13,7 +13,7 @@ from django.views.decorators.csrf import csrf_exempt
 
 from django.contrib.auth.hashers import make_password
 import requests
-
+import json
 
 from rest_framework import serializers
 from rest_framework import status
@@ -24,6 +24,7 @@ from rest_framework.parsers import JSONParser
  
 def principal(request):
 	return render(request,'principal_base.html')
+
 
 def cerrar_sesion(request):
 	logout(request)
@@ -473,7 +474,235 @@ def Eliminar_ACCOUNT_BANK(request,id_ACCOUNT_BANK):
 	return HttpResponseRedirect(reverse('app_CCDev:Vista_CBanco'))
 
 # Envio de Api
+#Api Login Simple
+class ApiLogin(APIView):
+
+	@method_decorator(csrf_exempt)
+	def dispatch(self, request, *args, **kwargs):
+		return super().dispatch(request, *args, **kwargs)
+
+	def post (self, request, format=None):
+		
+		ctx = {}
+		
+		if request.method == 'POST':
+			Data = json.loads(request.body)
+			contrasenia = Data['pass']
+			username = Data['user']
+			user = authenticate(username=username,password=contrasenia)
+			if user is not None:
+				if user.is_active:
+					auth_login(request,user)
+					#print(json.dumps({"c": 0, "b": 0, "a": 0}, sort_keys=True))
+					ctx = {'Data': 'True','Mensaje':'Acceso Consedido'}
+					return Response(ctx)
+				else:
+					ctx = {'Error':'USUARIO INACTIVO'}
+					return Response(ctx)
+			else:
+				ctx = {'Error':'USUARIO O CONTRASEÑA INCORRECTO'}
+				return Response(ctx)
+
+#Api cliente movil
+#API Tipo_producto
+class ApiTipo_producto(APIView):
+	ctx = {}
+	@method_decorator(csrf_exempt)
+	def dispatch(self, request, *args, **kwargs):
+		return super().dispatch(request, *args, **kwargs)
+	
+	
+	def get(self, request, format=None):
+		print(request.body)
+		if request.body:#Suponiendo que se enviara el id en el Json
+			Data = json.loads(request.body)
+			id_tp = Data['ID'] #Id del tipo de producto a filtrar
+			if Tipo_producto.objects.filter(pk=id_tp).exists():
+				T_producto = list(Tipo_producto.objects.filter(pk=id_tp).values('pk','descripcion_producto'))
+			else:
+				T_producto = list(Tipo_producto.objects.all().values('pk','descripcion_producto'))
+				ctx = {'Id':'No Encontrado','T_producto':T_producto}
+				return Response(ctx)
+		else:
+			T_producto = list(Tipo_producto.objects.all().values('pk','descripcion_producto'))
+
+		
+		
+		if T_producto:
+			ctx = {'T_producto':T_producto}
+			return Response(ctx)
+		else:
+			ctx = {'error','No hay Registros'}
+			return Response(ctx)
+	def post(self, request, format=None): 
+		query_Tproducto,errores, ctx = {},{},{}
+		if  request.method == 'POST':
+			
+			# print(request.body)
+			Data = json.loads(request.body)
+			D_producto = Data['descripcion_producto']
+			
+
+			if Tipo_producto.objects.filter(descripcion_producto = D_producto).exists():
+				ctx = {'Sussces','existe ya este tipo de producto'}
+				
+			else:
+				
+				
+				# descripcion_producto
+				if type(D_producto) != str:
+					errores['descripcion_producto'] = "La descripcion del producto no es un string"
+				else:
+					query_Tproducto['descripcion_producto'] = D_producto
+				
+				print(errores)
+
+				if not errores:
+					ctx = {'Sussces','Se almaceno con exito'}
+					T_producto = Tipo_producto(**query_Tproducto)
+					T_producto.save()
+				else:
+					ctx = {'error': errores}
+			return Response(ctx)
+	def put(self, request):
+		if  request.method == 'PUT':
+			Data = json.loads(request.body)
+			id_tp = Data['ID'] #Id del tipo de producto a filtrar
+			if Tipo_producto.objects.filter(pk=id_tp).exists():
+				
+				D_producto = Data['descripcion_producto']
+				
+				T_producto = Tipo_producto.objects.filter(pk=id_tp).update(
+																					descripcion_producto = D_producto,
+																					
+																					)
+				ctx = {'Sussces','Datos modificados'}
+				return Response(ctx)
+			else:
+				ctx = {'Error','ID no existente'}
+				return Response(ctx)
+	def delete(self, request):
+		if request.method == 'DELETE':
+			Data = json.loads(request.body)
+			id_tp = Data['ID'] 
+			if Tipo_producto.objects.filter(pk=id_tp).exists():
+				eliminar = Tipo_producto.objects.filter(pk=id_tp).delete()
+				ctx = {'Sussces','Registro Eliminado'}
+				return Response(ctx)
+			else:
+				ctx = {'Error','ID no existente'}
+				return Response(ctx)
 #API CLIENTE
+class ApiCliente(APIView):
+	ctx = {}
+	@method_decorator(csrf_exempt)
+	def dispatch(self, request, *args, **kwargs):
+		return super().dispatch(request, *args, **kwargs)
+	
+	
+	def get(self, request, format=None,id_CLIENT=""):
+		clientes = list(Cliente.objects.all().values('pk','nombres','apellidos','avatar','usuario','correo','direccion','n_identidad','genero','fecha_registro','estado'))
+		
+		if clientes:
+			ctx = {'clientes':clientes}
+			return Response(ctx)
+		else:
+			ctx = {'error','No hay Registros'}
+			return Response(ctx)
+	# def post(self, request, format=None): 
+	# 	query_CLEINT,errores, ctx = {},{},{}
+	# 	if  request.method == 'POST':
+			
+	# 		# print(request.body)
+	# 		Data = json.loads(request.body)
+
+			
+	# 		id = Data['ID']
+	# 		nombre = Data['NAME']
+	# 		origen = Data['ORIGIN']
+	# 		edad = Data['AGE']
+	# 		estado = Data['STATUS']
+
+	# 		if CLIENT.objects.filter(ID = id).exists():
+	# 			ctx = {'Sussces','existe ese id'}
+				
+	# 		else:
+				
+	# 			# ID
+	# 			if type(id) != str:
+	# 				errores['id'] = "El ID no es un string"
+	# 			else:
+	# 				query_CLEINT['ID'] = id
+	# 			# NAME
+	# 			if type(nombre) != str:
+	# 				errores['NAME'] = "El nombre no es un string"
+	# 			else:
+	# 				query_CLEINT['NAME'] = nombre
+	# 			# ORIGIN
+	# 			if type(origen) != str:
+	# 				errores['ORIGIN'] = "El origen no es un string"
+	# 			else:
+	# 				query_CLEINT['ORIGIN'] = origen
+	# 			# AGE
+	# 			if type(edad) != int:
+	# 				errores['AGE'] = "La edad no es un entero"
+	# 			else:
+	# 				query_CLEINT['AGE'] = edad
+	# 			# STATUS
+	# 			if type(estado) != str:
+	# 				errores['STATUS'] = "El estado no es un string"
+	# 			else:
+	# 				query_CLEINT['STATUS'] = estado
+	# 			print(errores)
+
+	# 			if not errores:
+	# 				ctx = {'Sussces','Se almaceno con exito'}
+	# 				cliente = CLIENT(**query_CLEINT)
+	# 				cliente.save()
+	# 			else:
+	# 				ctx = {'error': errores}
+	# 		return Response(ctx)
+	# def put(self, request):
+	# 	if  request.method == 'PUT':
+	# 		Data = json.loads(request.body)
+	# 		idC = Data['ID']
+	# 		if CLIENT.objects.filter(ID=idC).exists():
+				
+	# 			nombre = Data['NAME']
+	# 			origen = Data['ORIGIN']
+	# 			edad = Data['AGE']
+	# 			estado = Data['STATUS']
+				
+	# 			cliente = CLIENT.objects.filter(ID=idC).update(
+	# 																				NAME = nombre,
+	# 																				ORIGIN = origen,
+	# 																				AGE = edad,
+	# 																				STATUS = estado ,
+	# 																				)
+	# 			ctx = {'Sussces','Datos modificados'}
+	# 			return Response(ctx)
+	# 		else:
+	# 			ctx = {'Error','ID no existente'}
+	# 			return Response(ctx)
+	# def delete(self, request):
+	# 	if request.method == 'DELETE':
+	# 		Data = json.loads(request.body)
+	# 		idC = Data['ID']
+	# 		if CLIENT.objects.filter(ID=idC).exists():
+	# 			eliminar = CLIENT.objects.filter(ID=idC).delete()
+	# 			ctx = {'Sussces','Registro Eliminado'}
+	# 			return Response(ctx)
+	# 		else:
+	# 			ctx = {'Error','ID no existente'}
+	# 			return Response(ctx)
+
+
+
+
+
+		
+######################################
+#API CLIENTE CC
 class ApisendCLIENT(APIView):
 	ctx = {}
 	@method_decorator(csrf_exempt)

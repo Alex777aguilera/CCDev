@@ -28,4 +28,10 @@ urlpatterns = [
  path('vista/Vista_CBanco', views.Vista_CBanco, name='Vista_CBanco'),	
  path('modificar/ACCOUNT_BANK/<str:id_ACCOUNT_BANK>/', views.Modificar_CBanco, name="Modificar_CBanco"),
  path('Eliminar/ACCOUNT_BANK/<str:id_ACCOUNT_BANK>/', views.Eliminar_ACCOUNT_BANK, name="Eliminar_ACCOUNT_BANK"),
+
+ #ApiMovil / login
+ path('Api/Login', views.ApiLogin.as_view(), name='ApiLogin'),	
+ path('Api/Cliente', views.ApiCliente.as_view(), name='ApiCliente'),	
+ path('Api/Tipo/producto', views.ApiTipo_producto.as_view(), name='ApiTipo_producto'),
+ 
 ]
