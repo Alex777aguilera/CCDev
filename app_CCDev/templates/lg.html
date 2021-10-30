@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head >
+{% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'css/master.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/flot.css' %}">
+    <link rel="icon" type="image/jpg" href="{% static 'img/iclg.png' %}">
+
+    <title>Login</title>
+   <!--Made with love by Mutiullah Samim -->
+   
+    <!--Bootsrap 4 CDN-->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    
+    <!--Fontawesome CDN-->
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
+
+    <!--Custom styles-->
+    {% comment %} <link rel="stylesheet" type="text/css" href="{% static 'login_uth/login.css' %}"> {% endcomment %}
+</head>
+<body>    
+<div class="container">
+    <div class="d-flex justify-content-center h-100">
+        <div class="card">
+            <div class="card-header">
+                <h3>Iniciar Sesión</h3>
+                
+            </div><br><br>
+            <div class="card-body">
+                <form method="post">
+
+                   {% csrf_token %}
+                    <div style="color: red">{{mensaje}} </div>
+                    <div class="input-group form-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"><i class="fas fa-user"></i></span>
+                        </div>
+                        <input type="text" class="form-control" placeholder="Nombre de usuario" id="id_usuario" name="usuario">
+                        
+                    </div>
+                    <div class="input-group form-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"><i class="fas fa-key"></i></span>
+                        </div>
+                        <input type="password" class="form-control" placeholder="contraseña" id="id_contrasenia" name="contrasenia">
+                    </div>
+                    <br><br>
+                    <div class="form-group">
+                            <input type="submit" value="Login" class="btn float-right login_btn">
+                    </div>
+                </form>
+            </div>
+            <div class="card-footer">
+                <div class="d-flex justify-content-center links">
+                    Contactanos!!<a href="{% url 'app_CCDev:principal' %}">&nbsp;&nbsp;Ver</a>
+                </div>
+                <div class="d-flex justify-content-left">
+                    &copy; Copyright <strong><span>&nbsp;CC-Dev</span></strong>.&nbsp;Designed by <a href="https://github.com/Alex777aguilera">&nbsp;&nbsp;&nbsp;Sr.Aguilera</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
+

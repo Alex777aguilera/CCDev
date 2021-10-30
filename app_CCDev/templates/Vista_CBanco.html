@@ -1,0 +1,207 @@
+{% extends "Principal_blank.html" %}
+{% block titulo %}
+CC-DEV | Cuenta Bancaria
+{% endblock titulo %}
+{% load static %}
+{% block content %}
+
+    <!-- ======= Cta Section ======= -->
+    <section id="cta" class="cta">
+      <div class="container">
+
+        <div class="row" data-aos="zoom-out">
+          <div class="col-md-9 text-center text-lg-start">
+            <h3>Cuenta de Banco</h3>
+            
+          </div>
+        </div>
+
+      </div>
+    </section><!-- End Cta Section -->
+    
+
+<!-- Modal -->
+<div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-secondary">
+                <h5 class="modal-title  text-white"id="staticBackdropLabel">Registro Cuenta de Banco</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                
+                <form action="{% url 'app_CCDev:Vista_CBanco' %}" method="post" role="form" >
+                {% csrf_token %}
+                    <div class="row">
+                        
+                        <div class="mb-3 col-md-2 ">
+                            <label for="exampleInputEmail1" class="form-label">ID</label>
+                            <input type="text" class="form-control" name="ID" id="exampleInputEmail1" aria-describedby="emailHelp">
+                            
+                        </div>
+                        <div class="mb-3 col-md-4 ">
+                            <label for="exampleInputEmail1" class="form-label">Fecha</label>
+                            <input type="text" class="form-control" name="DATES" id="exampleInputEmail1" aria-describedby="emailHelp">
+                            
+                        </div>
+                        <div class="mb-3 col-md-6 ">
+                            <label for="exampleInputEmail1" class="form-label">Descripcion</label>
+                            <input type="text" class="form-control" name="DESCR" id="exampleInputEmail1" aria-describedby="emailHelp">
+                            
+                        </div>
+                        
+                    </div> 
+                    <div class="row">
+                        <div class="mb-3 col-md-6 ">
+                            <label for="exampleInputEmail1" class="form-label">Cliente</label>
+                            <input type="text" class="form-control" name="ID_CLIENT" id="exampleInputEmail1" aria-describedby="emailHelp">
+                            
+                        </div>
+                        <div class="mb-3 col-md-1 ">
+                            <label for="exampleInputEmail1" class="form-label">Tipo</label>
+                            <input type="text" class="form-control" name="TYPE" id="exampleInputEmail1" aria-describedby="emailHelp">
+                            
+                        </div>
+                        <div class="mb-3 col-md-2 ">
+                            <label for="exampleInputEmail1" class="form-label">Debito</label>
+                            <input type="text" class="form-control" name="DEBT" id="exampleInputEmail1" aria-describedby="emailHelp">
+                            
+                        </div>
+                        <div class="mb-3 col-md-2 ">
+                            <label for="exampleInputEmail1" class="form-label">Credito</label>
+                            <input type="text" class="form-control" name="CRED" id="exampleInputEmail1" aria-describedby="emailHelp">
+                            
+                        </div>
+                    </div>             
+            </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-warning text-white" data-bs-toggle="tooltip" data-bs-placement="bottom">Registrar</button>
+                    
+                </div>
+            </form>
+        </div>
+   </div>
+</div>
+
+<section id="services" class="contact">
+    <div class="container">
+        <div class="row mt-5">
+            <div class="col-lg-11 mt-5 mt-lg-0" data-aos="fade-left">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Datos de Cuentas Bancarias</h3>
+                        </div>
+                        
+                        
+                        <!-- /.card-header -->
+                        <div class="card-body">
+                        <!-- Button trigger modal -->
+                            <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+                            Registrar
+                            </button>
+                            <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+                            <a class="text-light" href="{% url 'app_CCDev:Vista_CBanco' %}">Actualizar
+                            </a>
+                            </button>
+                            
+                            
+                            <table id="myTable" class="table table-sm table-striped table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Fecha</th>
+                                        <th>Descripcion</th>
+                                        <th>Cliente</th>
+                                        <th>Tipo</th>
+                                        <th>Debito</th>
+                                        <th>Credito</th>
+                                        <th>Balance</th>
+                                        <th>Modificar</th>
+                                        <th>Eliminar</th>
+                                        
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                
+                                    {% for cuentas in Cuentas %}
+                                        <tr>
+                                            <td>{{cuentas.ID}}</td>
+                                            <td>{{cuentas.DATES}}</td>
+                                            <td>{{cuentas.DESCR}}</td>
+                                            <td>{{cuentas.ID_CLIENT}}</td>
+                                            <td>{{cuentas.TYPE}}</td>
+                                            <td>{{cuentas.DEBT}}</td>
+                                            <td>{{cuentas.CRED}}</td>
+                                            <td>{{cuentas.BALANCE}}</td>
+                                            <td>
+                                                <center>
+                                                <button type="button" class="btn btn-success btn-sm">
+                                                   <a class="text-light" href="{% url 'app_CCDev:Modificar_CBanco' cuentas.ID %}"><i class="fas fa-edit"></i></a>
+                                                </button>
+                                                </center>
+                                            </td>
+                                             <td>
+                                                <center>
+                                                <button type="button" class="btn btn-danger btn-sm">
+                                                   <a class="text-light" href="{% url 'app_CCDev:Eliminar_ACCOUNT_BANK' cuentas.ID %}"><i class="fas fa-trash-alt"></i></a>
+                                                </button>
+                                                </center>
+                                            </td>
+                                            
+                                        </tr>
+                                    {% empty %}
+                                        <p class="icontext"><i class="fas fa-exclamation-circle"> </i>  Aun no hay registros!!.</p>
+                                    {% endfor %}
+                                </tbody>
+                            
+                            </table>
+                        </div>    
+                    </div>
+                    
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+ </section><!-- End Contact Section -->
+  
+
+{% endblock content %}
+
+{% block js %}
+<script>
+
+
+ 
+{% if 'ok' in request.GET %}
+    alertify.success('Datos guardados con éxito.!!');  
+{% endif %}
+
+{% if errores.existe %}
+    alertify.error('Registro ya existente!!');
+{% endif %}
+
+{% if errores.ID %}
+    alertify.error('Debe ingresar El ID');
+{% elif errores.DATES %}
+    alertify.error('Debe ingresar los datos');
+{% elif errores.DESCR %}
+    alertify.error('Debe ingresar la descripcion');
+{% elif errores.ID_CLIENT %}
+    alertify.error('Debe ingresar el cliente');
+{% elif errores.TYPE %}
+    alertify.error('Debe ingresar el tipo');
+{% elif errores.DEBT %}
+    alertify.error('Debe ingresar el Debito');
+{% elif errores.CRED %}
+    alertify.error('Debe ingresar el credito');
+{% elif errores.BALANCE %}
+    alertify.error('Debito sobrepasa al credito!!');
+{% endif %}
+
+</script>
+{% endblock js %}

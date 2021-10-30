@@ -1,0 +1,187 @@
+{% extends "Principal_blank.html" %}
+{% block titulo %}
+CC-DEV | Cliente
+{% endblock titulo %}
+{% load static %}
+{% block content %}
+
+    <!-- ======= Cta Section ======= -->
+    <section id="cta" class="cta">
+      <div class="container">
+
+        <div class="row" data-aos="zoom-out">
+          <div class="col-md-9 text-center text-lg-start">
+            <h3>Cliente</h3>
+            
+          </div>
+        </div>
+
+      </div>
+    </section><!-- End Cta Section -->
+    
+
+<!-- Modal -->
+<div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-secondary">
+                <h5 class="modal-title  text-white"id="staticBackdropLabel">Registro Cliente</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                
+                <form action="{% url 'app_CCDev:Vista_Cliente' %}" method="post" role="form" >
+                {% csrf_token %}
+                    <div class="row">
+                        
+                        <div class="mb-3 col-md-3 ">
+                            <label for="exampleInputEmail1" class="form-label">ID</label>
+                            <input type="text" class="form-control" name="ID" id="exampleInputEmail1" aria-describedby="emailHelp">
+                            
+                        </div>
+                        <div class="mb-3 col-md-6 ">
+                            <label for="exampleInputEmail1" class="form-label">Nombre Completo</label>
+                            <input type="text" class="form-control" name="NAME" id="exampleInputEmail1" aria-describedby="emailHelp">
+                            
+                        </div>
+                        <div class="mb-3 col-md-3 ">
+                            <label for="exampleInputEmail1" class="form-label">Origen</label>
+                            <input type="text" class="form-control" name="ORIGIN" id="exampleInputEmail1" aria-describedby="emailHelp">
+                            
+                        </div>
+                        
+                    </div> 
+                    <div class="row">
+                        <div class="mb-3 col-md-3 ">
+                            <label for="exampleInputEmail1" class="form-label">Edad</label>
+                            <input type="text" class="form-control" name="AGE" id="exampleInputEmail1" aria-describedby="emailHelp">
+                            
+                        </div>
+                        <div class="mb-3 col-md-3 ">
+                            <label for="exampleInputEmail1" class="form-label">Estado</label>
+                            <input type="text" class="form-control" name="STATUS" id="exampleInputEmail1" aria-describedby="emailHelp">
+                            
+                        </div>
+                    </div>             
+            </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-warning text-white" data-bs-toggle="tooltip" data-bs-placement="bottom">Registrar</button>
+                    
+                </div>
+            </form>
+        </div>
+   </div>
+</div>
+
+<section id="services" class="contact">
+    <div class="container">
+        <div class="row mt-5">
+            <div class="col-lg-11 mt-5 mt-lg-0" data-aos="fade-left">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Datos Cliente</h3>
+                        </div>
+                        
+                        
+                        <!-- /.card-header -->
+                        <div class="card-body">
+                        <!-- Button trigger modal -->
+                            <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+                            Registrar
+                            </button>
+                            <button type="button" class="btn btn-success btn-sm">
+                            <a class="text-light" href="{% url 'app_CCDev:Vista_Cliente' %}">Actualizar
+                            </a>
+                            </button>
+                            
+                            
+                            <table id="myTable" class="table table-sm table-striped table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Nombre</th>
+                                        <th>Origen</th>
+                                        <th>Edad</th>
+                                        <th>Estado</th>
+                                        <th>Modificar</th>
+                                        <th>Eliminar</th>
+                                        
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                
+                                    {% for cliente in Clients %}
+                                        <tr>
+                                            <td>{{cliente.ID}}</td>
+                                            <td>{{cliente.NAME}}</td>
+                                            <td>{{cliente.ORIGIN}}</td>
+                                            <td>{{cliente.AGE}}</td>
+                                            <td>{{cliente.STATUS}}</td>
+                                            <td>
+                                                <center>
+                                                <button type="button" class="btn btn-success btn-sm">
+                                                   <a class="text-light" href="{% url 'app_CCDev:modificar_CLIENT' cliente.ID %}"><i class="fas fa-user-edit"></i></a>
+                                                </button>
+                                                </center>
+                                            </td>
+                                            <td>
+                                                <center>
+                                                <button type="button" class="btn btn-danger btn-sm">
+                                                   <a class="text-light" href="{% url 'app_CCDev:Eliminar_cliente' cliente.ID %}"><i class="fas fa-user-minus"></i></a>
+                                                </button>
+                                                </center>
+                                            </td>
+                                            
+                                        </tr>
+                                       
+ </div>
+                                       
+                                    {% empty %}
+                                        <p class="icontext"><i class="fas fa-exclamation-circle"> </i>  Aun no hay registros!!.</p>
+                                    {% endfor %}
+                                </tbody>
+                            
+                            </table>
+                        </div>    
+                    </div>
+                    
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+ </section><!-- End Contact Section -->
+                                  
+{% endblock content %}
+
+{% block js %}
+<script>
+
+
+ 
+{% if 'ok' in request.GET %}
+    alertify.success('Datos guardados con éxito.!!');
+{% endif %}
+
+{% if errores.existe %}
+    alertify.error('Registro ya existente!!');
+{% endif %}
+
+{% if errores.ID %}
+    alertify.error('Debe ingresar El ID');
+{% elif errores.NAME %}
+    alertify.error('Debe ingresar el nombre');
+{% elif errores.ORIGIN %}
+    alertify.error('Debe ingresar el origen');
+{% elif errores.AGE %}
+    alertify.error('Debe ingresar la edad');
+{% elif errores.STATUS %}
+    alertify.error('Debe ingresar el estado');
+{% endif %}
+
+</script>
+{% endblock js %}
