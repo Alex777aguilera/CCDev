@@ -3,16 +3,6 @@ from django.contrib.auth.models import User
 import sys
 # Create your models here.
 
-class Cliente(models.Model):
-    nombres = models.CharField(max_length=100, null = False,blank=False)
-    apellidos = models.CharField(max_length=100, null = False,blank=False)
-    usuario = models.ForeignKey(User,on_delete=models.CASCADE, null=False,blank=False)
-    fecha_registro = models.DateField(auto_now_add=True)
-    estado = models.BooleanField()
-
-    def __str__(self):
-        return "{}-{}-{}-{}".format(self.pk,self.nombres,self.apellidos, self.usuario.username)
-
 class Tipo_Cuenta(models.Model):
     tipo_cuenta = models.CharField(max_length=50, null= False,blank=False)
 
@@ -30,32 +20,6 @@ class Tipo_Moneda(models.Model):
 
     def __str__(self):
         return "{}-{}".format(self.pk,self.tipo_moneda)
-
-
-class Cuenta(models.Model):
-    id_cliente = models.ForeignKey(Cliente,on_delete=models.CASCADE, null=False,blank=False)
-    id_tipo_cuenta = models.ForeignKey(Tipo_Cuenta,on_delete=models.CASCADE, null=False,blank=False)
-    fecha_creacion = models.DateField(auto_now_add=True)
-    saldo_inicial = models.DecimalField(decimal_places=2, max_digits=6,null=False,blank=False)
-    saldo_anterior = models.DecimalField(decimal_places=2, max_digits=6,null=False,blank=False,default=0)
-    saldo_actual = models.DecimalField(decimal_places=2, max_digits=6,null=False,blank=False)
-
-    def __str__(self):
-        return "{}-{}-{}-{}".format(self.pk,self.id_cliente.nombres,self.id_cliente.apellidos,self.id_tipo_cuenta.tipo_cuenta)
-
-
-class Transacciones(models.Model):
-    id_cuenta = models.ForeignKey(Cuenta,on_delete=models.CASCADE, null=True)
-    id_cliente = models.ForeignKey(Cliente,on_delete=models.CASCADE, null=True)
-    id_tipo_transaccion = models.ForeignKey(Tipo_Transaccion,on_delete=models.CASCADE, null=True)
-    fecha_transaccion = models.DateField(auto_now_add=True)
-    saldo_actual = models.DecimalField(decimal_places=2, max_digits=6,null=False,blank=False)
-    saldo_anterior = models.DecimalField(decimal_places=2, max_digits=6,null=False,blank=False,default=0)
-    usuario = models.CharField(max_length=50,null=False,blank=False)
-    id_tipo_moneda = models.ForeignKey(Tipo_Moneda,on_delete=models.CASCADE, null=True)
-
-    def __str__(self):
-        return "{}-{}-{}-{}".format(self.pk,self.id_cuenta,self.id_cliente.nombres,self.id_cliente.apellidos,self.id_tipo_transaccion.tipo_transaccion)
 
 # Tablas feas
 class CLIENT(models.Model):
@@ -80,3 +44,108 @@ class ACCOUNT_BANK(models.Model):
 
     def __str__(self):
         return "{}-{}".format(self.ID,self.ID_CLIENT,self.CRED)
+
+#Tablas mobil
+#Catalagos
+class Genero(models.Model):
+    descripcion_genero = models.CharField(max_length=20,null = False,blank=False)
+
+    def __str__(self):
+        return "{}-{}".format(self.pk,self.descripcion_genero)
+
+#
+class Tipo_pago(models.Model):
+    descripcion_pago = models.CharField(max_length=20,null = False,blank=False)
+
+    def __str__(self):
+        return "{}-{}".format(self.pk,self.descripcion_pago)
+#
+class Tipo_producto(models.Model):
+    descripcion_producto = models.CharField(max_length=20,null = False,blank=False)
+
+    def __str__(self):
+        return "{}-{}".format(self.pk,self.descripcion_producto)
+
+#Transaccionales
+#Empresa
+class Empresa(models.Model):
+    nombre_empresa = models.CharField(max_length=20,null = False,blank=False)
+    logo =  models.BinaryField(blank = False, null = False, editable = True)
+    descripcion = models.CharField(max_length=200)
+    direccion = models.CharField( max_length=290)
+    telefono = models.CharField(max_length=15)
+    email = models.CharField( max_length=50)
+
+    
+
+    def __str__(self):
+        return "{}-{}".format(self.pk,self.nombre_empresa)
+
+#Poducto
+class Producto(models.Model):
+    nombre_producto = models.CharField(max_length=50,null = False,blank=False)
+    img_producto = models.BinaryField(blank = False, null = False, editable = True)
+    descripcion = models.CharField(max_length=200)
+    fecha_expira = models.DateField(auto_now=False, auto_now_add=False)
+    precio  =  models.DecimalField ( max_digits = 10 , decimal_places = 2 , null = True )
+    cantidad  =  models.DecimalField ( max_digits = 10 , decimal_places = 2 , null = True )
+    tipo_producto = models.ForeignKey(Tipo_producto,on_delete=models.CASCADE, null=False,blank=False)
+    fecha_registro = models.DateField(auto_now=False)
+    
+    def __str__(self):
+        return "{}-{}-{}".format(self.pk,self.nombre_producto,self.tipo_producto.descripcion_producto)
+
+#Cliente
+class Cliente(models.Model):
+    nombres = models.CharField(max_length=100, null = False,blank=False)
+    apellidos = models.CharField(max_length=100, null = False,blank=False)
+    avatar =  models.BinaryField(blank = True, null = True, editable = True)
+    usuario = models.ForeignKey(User,on_delete=models.CASCADE, null=False,blank=False)
+    correo = models.CharField(max_length=50, null= True)
+    direccion = models.CharField(max_length=100, null= False, blank = False)
+    n_identidad = models.CharField(max_length=30, null= False, blank = False)
+    genero = models.ForeignKey(Genero,on_delete=models.CASCADE, null=False,blank=False)
+    fecha_registro = models.DateField(auto_now_add=True)
+    estado = models.BooleanField()
+
+    def __str__(self):
+        return "{}-{}-{}-{}".format(self.pk,self.nombres,self.apellidos, self.usuario.username)
+
+
+#Carrito
+class Carrito(models.Model):
+
+    cantidad = models.DecimalField(max_digits=10,decimal_places=2, null=True)
+    producto =  models.ForeignKey(Producto, on_delete=models.CASCADE, null=False,blank=False)
+    usuario = models.ForeignKey(User,on_delete=models.CASCADE, null=True)
+    def __str__(self):
+        return "{}-{} |{}".format(self.pk,self.cantidad,self.producto.nombre_producto)
+
+
+#Orden
+class Orden(models.Model):
+    
+    carrito = models.ForeignKey(Carrito,on_delete=models.CASCADE, null=True)
+    usuario = models.ForeignKey(User,on_delete=models.CASCADE, null=True)
+    subtotal  =  models.DecimalField( max_digits = 10 , decimal_places = 2 , null = True )
+    isv  =  models.DecimalField( max_digits = 10 , decimal_places = 2 , null = True )
+    total  =  models.DecimalField( max_digits = 10 , decimal_places = 2 , null = True )
+    t_pago = models.ForeignKey(Tipo_pago,on_delete=models.CASCADE, null=True)
+    fecha_registro = models.DateField(auto_now_add=True)
+
+    
+    def __str__(self):
+        return "{}-{} |{}".format(self.pk,self.carrito,self.producto.nombre_producto.nombre_producto)
+
+#Detalle Orden
+class Detalle_Orden(models.Model):
+    orden = models.ForeignKey(Orden,on_delete=models.CASCADE, null=True)
+    cantidad = models.DecimalField(max_digits=10,decimal_places=2, null=True)
+    precio  =  models.DecimalField( max_digits = 10 , decimal_places = 2 , null = True )
+    producto = models.ForeignKey(Producto,on_delete=models.CASCADE, null=True)
+    total_producto = models.DecimalField(max_digits=10,decimal_places=2, null=True)
+
+    def __str__(self):
+        return "{}-{} |{}".format(self.pk,self.orden.producto.nombre_producto.nombre_producto)
+
+
