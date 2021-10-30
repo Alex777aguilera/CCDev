@@ -477,10 +477,6 @@ def Eliminar_ACCOUNT_BANK(request,id_ACCOUNT_BANK):
 #Api Login Simple
 class ApiLogin(APIView):
 
-	@method_decorator(csrf_exempt)
-	def dispatch(self, request, *args, **kwargs):
-		return super().dispatch(request, *args, **kwargs)
-
 	def post (self, request, format=None):
 		
 		ctx = {}
@@ -497,10 +493,10 @@ class ApiLogin(APIView):
 					ctx = {'Data': 'True','Mensaje':'Acceso Consedido'}
 					return Response(ctx)
 				else:
-					ctx = {'Error':'USUARIO INACTIVO'}
+					ctx = {'Data': 'False','Mensaje':'USUARIO INACTIVO'}
 					return Response(ctx)
 			else:
-				ctx = {'Error':'USUARIO O CONTRASEÑA INCORRECTO'}
+				ctx = {'Data': 'False','Mensaje':'USUARIO O CONTRASEÑA INCORRECTO'}
 				return Response(ctx)
 
 #Api cliente movil
