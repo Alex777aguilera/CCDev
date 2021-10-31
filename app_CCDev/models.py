@@ -76,7 +76,7 @@ class Empresa(models.Model):
     telefono = models.CharField(max_length=15)
     email = models.CharField( max_length=50)
 
-    
+
 
     def __str__(self):
         return "{}-{}".format(self.pk,self.nombre_empresa)
@@ -91,7 +91,7 @@ class Producto(models.Model):
     cantidad  =  models.DecimalField ( max_digits = 10 , decimal_places = 2 , null = True )
     tipo_producto = models.ForeignKey(Tipo_producto,on_delete=models.CASCADE, null=False,blank=False)
     fecha_registro = models.DateField(auto_now=False)
-    
+
     def __str__(self):
         return "{}-{}-{}".format(self.pk,self.nombre_producto,self.tipo_producto.descripcion_producto)
 
@@ -109,7 +109,7 @@ class Cliente(models.Model):
     estado = models.BooleanField()
 
     def __str__(self):
-        return "{}-{}-{}-{}".format(self.pk,self.nombres,self.apellidos, self.usuario.username)
+        return "{}-{}-{}-{}".format(self.pk,self.nombres,self.apellidos, self.usuario.username,self.usuario.pk)
 
 
 #Carrito
@@ -124,7 +124,7 @@ class Carrito(models.Model):
 
 #Orden
 class Orden(models.Model):
-    
+
     carrito = models.ForeignKey(Carrito,on_delete=models.CASCADE, null=True)
     usuario = models.ForeignKey(User,on_delete=models.CASCADE, null=True)
     subtotal  =  models.DecimalField( max_digits = 10 , decimal_places = 2 , null = True )
@@ -133,7 +133,7 @@ class Orden(models.Model):
     t_pago = models.ForeignKey(Tipo_pago,on_delete=models.CASCADE, null=True)
     fecha_registro = models.DateField(auto_now_add=True)
 
-    
+
     def __str__(self):
         return "{}-{} |{}".format(self.pk,self.carrito,self.producto.nombre_producto.nombre_producto)
 
@@ -147,5 +147,3 @@ class Detalle_Orden(models.Model):
 
     def __str__(self):
         return "{}-{} |{}".format(self.pk,self.orden.producto.nombre_producto.nombre_producto)
-
-
