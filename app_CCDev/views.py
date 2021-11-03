@@ -585,31 +585,39 @@ class ApiTipo_producto(APIView):
 				ctx = {'Error','ID no existente'}
 				return Response(ctx)
 
-# class Apiproductos(APIView):
-#     ctx = {}
-#
-# 	def get(self, request, format=None):
-# 		print(request.body)
-# 		if request.body:#Suponiendo que se enviara el id en el Json
-# 			Data = json.loads(request.body)
-# 			id_ep = Data['ID'] #Id del tipo de producto a filtrar
-# 			if Empresa.objects.filter(pk=id_ep).exists():
-# 				Empresas = list(Empresa.objects.filter(pk=id_ep).values('pk','descripcion_producto'))
-# 			else:
-# 				Empresas = list(Tipo_producto.objects.all().values('pk','descripcion_producto'))
-# 				ctx = {'Id':'No Encontrado','T_producto':T_producto}
-# 				return Response(ctx)
-# 		else:
-# 			Empresas = list(Tipo_producto.objects.all().values('pk','descripcion_producto'))
-#
-#
-#
-# 		if Empresas:
-# 			ctx = {'Empresa':Empresas}
-# 			return Response(ctx)
-# 		else:
-# 			ctx = {'error','No hay Registros'}
-# 			return Response(ctx)
+class Apiproductos(APIView):
+	ctx = {}
+	def get(self, request, format=None):
+		a = Producto.objects.get(pk=1)
+		
+		res = (a.img_producto, 'utf-8')
+		#res = bytes(str(a.img_producto), 'utf-8')
+		print(res)
+
+
+		if request.body:#Suponiendo que se enviara el id en el Json
+			Data = json.loads(request.body)
+			id_p = Data['ID'] #Id del tipo de producto a filtrar
+			if Producto.objects.filter(pk=id_p).exists():
+				productos = list(Producto.objects.filter(pk=id_p).values('pk','nombre_producto','descripcion','fecha_expira','precio','cantidad','tipo_producto','fecha_registro'))
+				ctx = {'Id':'Encontrado','productos':productos}
+				return Response(ctx)
+			else:
+				productos = list(Producto.objects.all().values('pk','nombre_producto','descripcion','fecha_expira','precio','cantidad','tipo_producto','fecha_registro'))
+				ctx = {'Id':'No Encontrado','productos':productos}
+				return Response(ctx)
+		else:
+			productos = list(Producto.objects.all().values('pk','nombre_producto','descripcion','fecha_expira','precio','cantidad','tipo_producto','fecha_registro'))
+			
+
+
+
+		if productos:
+			ctx = {'Id':'Id no solicitado','productos':productos,'img_producto':res}
+			return Response(ctx)
+		else:
+			ctx = {'error','No hay Registros'}
+			return Response(ctx)
 #API CLIENTE
 class ApiCliente(APIView):
     ctx={}

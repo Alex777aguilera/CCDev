@@ -93,7 +93,7 @@ class Producto(models.Model):
     fecha_registro = models.DateField(auto_now=False)
 
     def __str__(self):
-        return "{}-{}-{}".format(self.pk,self.nombre_producto,self.tipo_producto.descripcion_producto)
+        return "{}-{}-{}-{}".format(self.pk,self.nombre_producto,self.tipo_producto.descripcion_producto,self.img_producto)
 
 #Cliente
 class Cliente(models.Model):

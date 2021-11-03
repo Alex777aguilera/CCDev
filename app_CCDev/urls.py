@@ -34,5 +34,6 @@ urlpatterns = [
  path('Api/Cliente', views.ApiCliente.as_view(), name='ApiCliente'),
  path('Api/Tipo/producto', views.ApiTipo_producto.as_view(), name='ApiTipo_producto'),
  path('Api/Carrito', views.ApiCarrito_Cliente.as_view(), name='ApiCarrito_Cliente'),
+ path('Api/Productos', views.Apiproductos.as_view(), name='Apiproductos'),
 
 ]
