@@ -14,6 +14,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.hashers import make_password
 import requests
 import json
+import base64
 
 from rest_framework import serializers
 from rest_framework import status
@@ -589,31 +590,42 @@ class Apiproductos(APIView):
 	ctx = {}
 	def get(self, request, format=None):
 		a = Producto.objects.get(pk=1)
-		
-		res = (a.img_producto, 'utf-8')
-		#res = bytes(str(a.img_producto), 'utf-8')
-		print(res)
+		# print(type(a.img_producto))
+		# res = (a.img_producto, 'utf-8')
+		# #res = bytes(str(a.img_producto), 'utf-8')
+		# print(res)
 
+		print(type(a.img_producto))
+		#print(a.img_producto)
 
+		#Convirtiendo a Base64
+		img_base64 = base64.b64encode(str(a.img_producto).encode('utf-8'))
+		print(type(img_base64))
+		lista_prod = []
 		if request.body:#Suponiendo que se enviara el id en el Json
 			Data = json.loads(request.body)
 			id_p = Data['ID'] #Id del tipo de producto a filtrar
 			if Producto.objects.filter(pk=id_p).exists():
-				productos = list(Producto.objects.filter(pk=id_p).values('pk','nombre_producto','descripcion','fecha_expira','precio','cantidad','tipo_producto','fecha_registro'))
-				ctx = {'Id':'Encontrado','productos':productos}
+				#productos = list(Producto.objects.filter(pk=id_p).values('pk','nombre_producto','descripcion','fecha_expira','precio','cantidad','tipo_producto','fecha_registro'))
+				p = Producto.objects.get(pk=id_p)
+				lista_prod = [{'pk':p.pk, 'nombre_producto':p.nombre_producto, 'descripcion':p.descripcion, 'fecha_expira':p.fecha_expira, 'precio':p.precio, 'cantidad':p.cantidad, 'tipo_producto':p.tipo_producto.id, 'fecha_registro':p.fecha_registro, 'imagen':base64.b64encode(str(p.img_producto).encode('utf-8'))}]
+				ctx = {'Id':'Encontrado','productos':lista_prod}
 				return Response(ctx)
 			else:
-				productos = list(Producto.objects.all().values('pk','nombre_producto','descripcion','fecha_expira','precio','cantidad','tipo_producto','fecha_registro'))
-				ctx = {'Id':'No Encontrado','productos':productos}
+				#productos = list(Producto.objects.all().values('pk','nombre_producto','descripcion','fecha_expira','precio','cantidad','tipo_producto','fecha_registro'))
+				for p in Producto.objects.all():
+					lista_prod.append({'pk':p.pk, 'nombre_producto':p.nombre_producto, 'descripcion':p.descripcion, 'fecha_expira':p.fecha_expira, 'precio':p.precio, 'cantidad':p.cantidad, 'tipo_producto':p.tipo_producto.id, 'fecha_registro':p.fecha_registro, 'imagen':base64.b64encode(str(p.img_producto).encode('utf-8'))})
+				
+				ctx = {'Id':'No Encontrado','productos':lista_prod}
 				return Response(ctx)
 		else:
-			productos = list(Producto.objects.all().values('pk','nombre_producto','descripcion','fecha_expira','precio','cantidad','tipo_producto','fecha_registro'))
+			for p in Producto.objects.all():
+				lista_prod.append({'pk':p.pk, 'nombre_producto':p.nombre_producto, 'descripcion':p.descripcion, 'fecha_expira':p.fecha_expira, 'precio':p.precio, 'cantidad':p.cantidad, 'tipo_producto':p.tipo_producto.id, 'fecha_registro':p.fecha_registro, 'imagen':base64.b64encode(str(p.img_producto).encode('utf-8'))})
 			
+			#productos = list(Producto.objects.all().values('pk','nombre_producto','descripcion','fecha_expira','precio','cantidad','tipo_producto','fecha_registro'))
 
-
-
-		if productos:
-			ctx = {'Id':'Id no solicitado','productos':productos,'img_producto':res}
+		if lista_prod:
+			ctx = {'Id':'Id no solicitado','productos':lista_prod}#'img_producto':res
 			return Response(ctx)
 		else:
 			ctx = {'error','No hay Registros'}
